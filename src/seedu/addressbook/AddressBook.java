@@ -65,6 +65,7 @@ public class AddressBook {
      * at which java String.format(...) method can insert values.
      * =========================================================================
      */
+    private static final String MESSAGE_CHANGE = "Change successful";
     private static final String MESSAGE_ADDED = "New person added: %1$s, Phone: %2$s, Email: %3$s";
     private static final String MESSAGE_ADDRESSBOOK_CLEARED = "Address book has been cleared!";
     private static final String MESSAGE_COMMAND_HELP = "%1$s: %2$s";
@@ -132,6 +133,7 @@ public class AddressBook {
     private static final String COMMAND_EXIT_WORD = "exit";
     private static final String COMMAND_EXIT_DESC = "Exits the program.";
     private static final String COMMAND_EXIT_EXAMPLE = COMMAND_EXIT_WORD;
+    private static final String COMMAND_EDIT_WORD = "edit";
 
     private static final String DIVIDER = "===================================================";
 
@@ -371,6 +373,8 @@ public class AddressBook {
         switch (commandType) {
         case COMMAND_ADD_WORD:
             return executeAddPerson(commandArgs);
+        case COMMAND_EDIT_WORD:
+            return editPersonPaticulars(commandArgs);
         case COMMAND_FIND_WORD:
             return executeFindPersons(commandArgs);
         case COMMAND_LIST_WORD:
@@ -776,7 +780,37 @@ public class AddressBook {
      *        INTERNAL ADDRESS BOOK DATA METHODS
      * ================================================================================
      */
+    //Added function to edit the person's phone number
+    private static String editPersonPaticulars(String targetPerson){
 
+        String nameOfperson = nameExtract(targetPerson);
+        String newPhonenumber = phoneExtract(targetPerson);
+
+        //Iterating through the Arraylist
+        for(int iterator=0;iterator<ALL_PERSONS.size();iterator++){
+
+            //If they have the same name
+            if(getNameFromPerson(ALL_PERSONS.get(iterator)).equals(nameOfperson)){
+
+                String[] pointer = ALL_PERSONS.get(iterator);
+                pointer[1] = newPhonenumber;
+                savePersonsToFile(getAllPersonsInAddressBook(), storageFilePath);
+
+            }
+        }
+        return MESSAGE_CHANGE;
+    }
+    private static String nameExtract(String encoded) {
+        final int PhonePrefix = encoded.indexOf(PERSON_DATA_PREFIX_PHONE);
+        // name is leading substring up to first data prefix symbol
+        return encoded.substring(0, PhonePrefix).trim();
+    }
+    private static String phoneExtract(String encoded) {
+        final int PhonePrefixlocal = encoded.indexOf(PERSON_DATA_PREFIX_PHONE);
+        // name is leading substring up to first data prefix symbol
+        return removePrefixSign(encoded.substring(PhonePrefixlocal, encoded.length()).trim(),
+                PERSON_DATA_PREFIX_PHONE);
+    }
     /**
      * Adds a person to the address book. Saves changes to storage file.
      *
